@@ -5,6 +5,7 @@ namespace RulerZ\Target\Pomm;
 use Hoa\Ruler\Model as AST;
 
 use RulerZ\Model;
+use RulerZ\Target\GenericVisitor;
 use RulerZ\Target\GenericSqlVisitor;
 
 class PommVisitor extends GenericSqlVisitor
@@ -46,5 +47,10 @@ class PommVisitor extends GenericSqlVisitor
         }
 
         return sprintf('(new \PommProject\Foundation\Where("%s", [%s]))', $sql, implode(', ', $parameters));
+    }
+
+    protected function visitRuntimeOperator(AST\Operator $element, &$handle = null, $eldnah = null)
+    {
+        return GenericVisitor::visitRuntimeOperator($element, $handle, $eldnah);
     }
 }

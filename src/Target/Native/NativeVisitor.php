@@ -40,4 +40,14 @@ class NativeVisitor extends GenericVisitor
     {
         return sprintf('array(%s)', implode(', ', parent::visitArray($element, $handle, $eldnah)));
     }
+
+    protected function visitRuntimeOperator(AST\Operator $element, &$handle = null, $eldnah = null)
+    {
+        $arguments = array_map(function ($argument) use (&$handle, $eldnah) {
+            return $argument->accept($this, $handle, $eldnah);
+        }, $element->getArguments());
+        $inlinedArguments = empty($arguments) ? '' : ', ' . implode(', ', $arguments);
+
+        return sprintf('call_user_func($operators["%s"]%s)', $element->getName(), $inlinedArguments);
+    }
 }

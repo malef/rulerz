@@ -95,4 +95,9 @@ class GenericSqlVisitor extends GenericVisitor
 
         return sprintf('%s(%s)', $element->getName(), implode(', ', $arguments));
     }
+
+    protected function visitRuntimeOperator(AST\Operator $element, &$handle = null, $eldnah = null)
+    {
+        return '".' . parent::visitRuntimeOperator($element, $handle, $eldnah) . '."';
+    }
 }

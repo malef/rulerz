@@ -47,4 +47,9 @@ class SolariumVisitor extends GenericVisitor
 
         return "'. \$parameters['$parameterName'] .'";
     }
+
+    protected function visitRuntimeOperator(AST\Operator $element, &$handle = null, $eldnah = null)
+    {
+        return "'." . parent::visitRuntimeOperator($element, $handle, $eldnah) . ".'";
+    }
 }

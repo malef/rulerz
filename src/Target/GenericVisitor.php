@@ -105,21 +105,31 @@ abstract class GenericVisitor implements RuleVisitor
             throw new OperatorNotFoundException($operatorName, sprintf('Operator "%s" does not exist.', $operatorName));
         }
 
+        if ($this->operators->hasInlineOperator($operatorName)) {
+            return $this->visitInlineOperator($element, $handle, $eldnah);
+        }
+
+        return $this->visitRuntimeOperator($element, $handle, $eldnah);
+    }
+
+    protected function visitRuntimeOperator(AST\Operator $element, &$handle = null, $eldnah = null)
+    {
+        $nativeVisitor = new Native\NativeVisitor(
+            new Operators\Definitions($this->operators->getOperators())
+        );
+
+        return $nativeVisitor->visitOperator($element);
+    }
+
+    protected function visitInlineOperator(AST\Operator $element, &$handle = null, $eldnah = null)
+    {
         // expand the arguments
         $arguments = array_map(function ($argument) use (&$handle, $eldnah) {
             return $argument->accept($this, $handle, $eldnah);
         }, $element->getArguments());
 
-        // and either inline the operator call
-        if ($this->operators->hasInlineOperator($operatorName)) {
-            $callable = $this->operators->getInlineOperator($operatorName);
+        $callable = $this->operators->getInlineOperator($element->getName());
 
-            return call_user_func_array($callable, $arguments);
-        }
-
-        $inlinedArguments = empty($arguments) ? '' : ', ' . implode(', ', $arguments);
-
-        // or defer it.
-        return sprintf('call_user_func($operators["%s"]%s)', $operatorName, $inlinedArguments);
+        return call_user_func_array($callable, $arguments);
     }
 }
