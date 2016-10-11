@@ -19,7 +19,7 @@ class FileEvaluator implements Evaluator
      */
     public function evaluate($ruleIdentifier, callable $compiler)
     {
-        $fileName = $this->directory . DIRECTORY_SEPARATOR . 'rulerz_executor_' . $ruleIdentifier;
+        $fileName = $this->directory . DIRECTORY_SEPARATOR . 'rulerz_executor_' . $ruleIdentifier . '.php';
 
         if (!file_exists($fileName)) {
             file_put_contents($fileName, '<?php'."\n".$compiler());
