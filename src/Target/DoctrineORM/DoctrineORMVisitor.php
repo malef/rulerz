@@ -30,7 +30,9 @@ class DoctrineORMVisitor extends GenericSqlVisitor
     public function getCompilationData()
     {
         return [
-            'detectedJoins' => $this->autoJoin->getDetectedJoins(),
+            'detectedJoins' => $this->removeDuplicateJoins(
+                $this->autoJoin->getDetectedJoins()
+            ),
         ];
     }
 
@@ -54,5 +56,41 @@ class DoctrineORMVisitor extends GenericSqlVisitor
 
         // placeholder for a named parameter
         return ':' . $element->getName();
+    }
+
+    /**
+     * @param array $joins
+     * @return array
+     */
+    protected function removeDuplicateJoins(array $joins)
+    {
+        $uniqueJoins = [];
+        foreach ($joins as $join) {
+            if (!$this->isJoinContainedInUniqueJoins($join, $uniqueJoins)) {
+                $uniqueJoins[] = $join;
+            }
+        }
+
+        return $uniqueJoins;
+    }
+
+    /**
+     * @param array $join
+     * @param array $uniqueJoins
+     * @return bool
+     */
+    protected function isJoinContainedInUniqueJoins(array $join, array $uniqueJoins)
+    {
+        foreach ($uniqueJoins as $uniqueJoin) {
+            if (
+                $join['root'] === $uniqueJoin['root']
+                && $join['column'] === $uniqueJoin['column']
+                && $join['as'] === $uniqueJoin['as']
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
