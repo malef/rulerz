@@ -56,8 +56,6 @@ class Parser implements Visitor\Visit
      */
     public function parse($rule)
     {
-        $this->nextParameterIndex = 0;
-
         if ($this->parser === null) {
             $this->parser = Compiler\Llk::load(
                 new File\Read(__DIR__ .'/../Grammar.pp')
